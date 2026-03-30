@@ -1,0 +1,112 @@
+### ============================================
+### 02 — 景区接口
+### ============================================
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@token = YOUR_TOKEN_HERE
+
+# ------------------------------------------
+# 2.1 搜索全部景区
+# ------------------------------------------
+### 搜索全部景区
+GET {{baseUrl}}/api/attractions/search?city=&keyword=
+
+###
+
+# ------------------------------------------
+# 2.2 按城市搜索
+# ------------------------------------------
+### 搜索西安景区
+GET {{baseUrl}}/api/attractions/search?city=西安
+
+###
+
+### 搜索北京景区
+GET {{baseUrl}}/api/attractions/search?city=北京
+
+###
+
+### 搜索成都景区
+GET {{baseUrl}}/api/attractions/search?city=成都
+
+###
+
+### 搜索杭州景区
+GET {{baseUrl}}/api/attractions/search?city=杭州
+
+###
+
+### 搜索上海景区
+GET {{baseUrl}}/api/attractions/search?city=上海
+
+###
+
+# ------------------------------------------
+# 2.3 按关键词搜索
+# ------------------------------------------
+### 关键词搜索：兵马俑
+GET {{baseUrl}}/api/attractions/search?keyword=bingmayong
+
+###
+
+### 关键词搜索：故宫
+GET {{baseUrl}}/api/attractions/search?keyword=gugong
+
+###
+
+# ------------------------------------------
+# 2.4 查询景区详情（多层缓存）
+# ------------------------------------------
+### 景区详情 - 兵马俑(1001)
+GET {{baseUrl}}/api/attractions/1001
+
+###
+
+### 景区详情 - 故宫(1006)
+GET {{baseUrl}}/api/attractions/1006
+
+###
+
+### 景区详情 - 九寨沟(1013)
+GET {{baseUrl}}/api/attractions/1013
+
+###
+
+### 景区详情 - 西湖(1010)
+GET {{baseUrl}}/api/attractions/1010
+
+###
+
+### 景区详情 - 不存在的ID（测试布隆过滤器防穿透）
+GET {{baseUrl}}/api/attractions/9999999
+
+###
+
+# ------------------------------------------
+# 2.5 查询景区门票库存
+# ------------------------------------------
+### 查询兵马俑库存
+GET {{baseUrl}}/api/attractions/1001/stock
+
+###
+
+### 查询故宫库存
+GET {{baseUrl}}/api/attractions/1006/stock
+
+###
+
+### 查询九寨沟库存
+GET {{baseUrl}}/api/attractions/1013/stock
+
+###
+
+### 查询八达岭长城库存
+GET {{baseUrl}}/api/attractions/1009/stock
+
+###
+
+### 查询拙政园库存
+GET {{baseUrl}}/api/attractions/1018/stock
+
+###

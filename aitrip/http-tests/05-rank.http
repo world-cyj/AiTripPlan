@@ -1,0 +1,79 @@
+### ============================================
+### 05 — 热榜接口
+### ============================================
+
+@baseUrl = http://localhost:8080
+
+# ------------------------------------------
+# 5.1 全站热榜
+# ------------------------------------------
+### 全站 Top10 热榜
+GET {{baseUrl}}/api/rank/hot?topN=10
+
+###
+
+### 全站 Top5 热榜
+GET {{baseUrl}}/api/rank/hot?topN=5
+
+###
+
+### 全站 Top20 热榜
+GET {{baseUrl}}/api/rank/hot?topN=20
+
+###
+
+# ------------------------------------------
+# 5.2 城市热榜
+# ------------------------------------------
+### 西安城市 Top5
+GET {{baseUrl}}/api/rank/city/xian?topN=5
+
+###
+
+### 北京城市 Top5
+GET {{baseUrl}}/api/rank/city/beijing?topN=5
+
+###
+
+### 成都城市 Top5
+GET {{baseUrl}}/api/rank/city/chengdu?topN=5
+
+###
+
+### 上海城市 Top5
+GET {{baseUrl}}/api/rank/city/shanghai?topN=5
+
+###
+
+# ------------------------------------------
+# 5.3 记录访问热度（前端埋点）
+# ------------------------------------------
+### 记录访问 - 兵马俑
+POST {{baseUrl}}/api/rank/visit?attractionId=1001&userId=1
+
+###
+
+### 记录访问 - 故宫
+POST {{baseUrl}}/api/rank/visit?attractionId=1006&userId=2
+
+###
+
+### 记录访问 - 九寨沟
+POST {{baseUrl}}/api/rank/visit?attractionId=1013&userId=3
+
+###
+
+### 记录访问 - 西湖
+POST {{baseUrl}}/api/rank/visit?attractionId=1010&userId=1
+
+###
+
+### 记录访问 - 外滩
+POST {{baseUrl}}/api/rank/visit?attractionId=1014&userId=2
+
+###
+
+### 匿名访问记录
+POST {{baseUrl}}/api/rank/visit?attractionId=1001&userId=anonymous
+
+###

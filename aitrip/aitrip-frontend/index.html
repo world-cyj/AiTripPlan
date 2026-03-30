@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AiTrip — 智能旅游服务平台</title>
+<link rel="stylesheet" href="src/css/variables.css">
+<link rel="stylesheet" href="src/css/main.css">
+</head>
+<body>
+
+<!-- Toast 容器 -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="container">
+    <div class="navbar-logo">
+      <div class="logo-icon">✈</div>
+      AiTrip
+    </div>
+    <div class="navbar-nav">
+      <button class="nav-btn active" data-page="home" onclick="showPage('home')">🏠 首页</button>
+      <button class="nav-btn" data-page="plan" onclick="showPage('plan')">🤖 AI规划</button>
+      <button class="nav-btn" data-page="explore" onclick="showPage('explore')">🗺 探索</button>
+      <button class="nav-btn" data-page="seckill" onclick="showPage('seckill')">⚡ 秒杀</button>
+      <button class="nav-btn" data-page="orders" onclick="showPage('orders')">📦 我的订单</button>
+    </div>
+    <div class="navbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="openPortSettings()" title="端口设置">⚙️</button>
+      <div id="user-badge" class="user-badge">
+        <span class="user-dot" style="background:var(--text-muted);box-shadow:none"></span> 登录
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- 服务状态横幅 -->
+<div id="status-banner" style="display:none;position:fixed;top:64px;left:0;right:0;z-index:99;padding:8px 24px;font-size:.82rem;text-align:center"></div>
+
+<div id="page-home" class="page active" style="padding-top:64px">
+  <!-- Hero -->
+  <div style="background:linear-gradient(180deg,rgba(251,191,36,.04) 0%,transparent 100%);border-bottom:1px solid var(--border);padding:56px 0 48px">
+    <div class="container" style="text-align:center">
+      <div class="hero-tag">✨ AI 驱动的智能旅游平台</div>
+      <h1 style="font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.15;letter-spacing:-.03em;margin-bottom:16px">
+        让 <span style="background:linear-gradient(135deg,var(--accent),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent">AI</span> 帮你规划<br>完美旅行方案
+      </h1>
+      <p style="font-size:1rem;color:var(--text-secondary);max-width:480px;margin:0 auto 32px;line-height:1.7">
+        自然语言对话 · 实时景区热榜 · 高并发秒杀抢票<br>从规划到下单，一站完成
+      </p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary btn-lg" onclick="showPage('plan')">🤖 开始 AI 规划</button>
+        <button class="btn btn-ghost btn-lg" onclick="showPage('explore')">🗺 浏览景区</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- 统计栏 -->
+    <div class="stat-grid" style="margin:36px 0">
+      <div class="stat-card"><div class="stat-value" id="stat-attractions">—</div><div class="stat-label">收录景区</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--teal)">500+</div><div class="stat-label">并发秒杀 TPS</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--rose)">0%</div><div class="stat-label">超卖率</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--text-secondary)">2min</div><div class="stat-label">AI 规划耗时</div></div>
+    </div>
+
+    <div class="grid-2" style="gap:32px;margin-bottom:48px">
+      <!-- 热榜 -->
+      <div>
+        <div class="section-header">
+          <div>
+            <div class="section-title">🔥 实时<span>热榜</span></div>
+            <div class="section-sub">基于 Redis ZSet 实时热度排名</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="loadHotRank()">刷新</button>
+        </div>
+        <div class="card" style="padding:8px 20px">
+          <div id="rank-list"><div class="loading-overlay"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+      <!-- 精选景区 -->
+      <div>
+        <div class="section-header">
+          <div>
+            <div class="section-title">⭐ 精选<span>景区</span></div>
+            <div class="section-sub">多层缓存驱动，毫秒级响应</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('explore')">全部 →</button>
+        </div>
+        <div id="featured-list" class="grid-2" style="gap:14px"><div class="loading-overlay"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+
+    <!-- 功能特性 -->
+    <div style="margin-bottom:56px">
+      <div class="section-title" style="text-align:center;margin-bottom:28px">核心<span>技术亮点</span></div>
+      <div class="grid-3">
+        <div class="card" style="text-align:center">
+          <div style="font-size:2.2rem;margin-bottom:12px">🤖</div>
+          <div style="font-weight:700;margin-bottom:8px">ReAct Agent</div>
+          <div style="font-size:.82rem;color:var(--text-secondary);line-height:1.6">Spring AI 多 Agent 协同，SSE 流式输出，支持多轮对话记忆</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:2.2rem;margin-bottom:12px">⚡</div>
+          <div style="font-weight:700;margin-bottom:8px">Lua 原子防超卖</div>
+          <div style="font-size:.82rem;color:var(--text-secondary);line-height:1.6">Redis Lua 脚本原子操作，500并发零超卖，P99 &lt;200ms</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:2.2rem;margin-bottom:12px">🛡</div>
+          <div style="font-weight:700;margin-bottom:8px">三层缓存防护</div>
+          <div style="font-size:.82rem;color:var(--text-secondary);line-height:1.6">Caffeine + 布隆过滤器 + Redis，防穿透/击穿/雪崩</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:2.2rem;margin-bottom:12px">📨</div>
+          <div style="font-weight:700;margin-bottom:8px">Outbox + Kafka</div>
+          <div style="font-size:.82rem;color:var(--text-secondary);line-height:1.6">消息最终一致性，幂等消费，DLQ 死信兜底，零丢单</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:2.2rem;margin-bottom:12px">🔔</div>
+          <div style="font-weight:700;margin-bottom:8px">延迟队列通知</div>
+          <div style="font-size:.82rem;color:var(--text-secondary);line-height:1.6">Redisson 延迟队列，退票后2分钟精准推送订阅用户</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:2.2rem;margin-bottom:12px">🗄</div>
+          <div style="font-weight:700;margin-bottom:8px">分库分表</div>
+          <div style="font-size:.82rem;color:var(--text-secondary);line-height:1.6">ShardingSphere 订单分库，雪花 ID 全局唯一，水平扩展</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== AI 规划页 ========== -->
+<div id="page-plan" class="page" style="padding-top:64px">
+  <div class="container" style="padding-top:36px;padding-bottom:48px;max-width:860px">
+    <div class="section-header">
+      <div>
+        <div class="section-title">🤖 AI <span>旅行规划</span></div>
+        <div class="section-sub">Spring AI ReAct Agent · SSE 流式输出 · 多轮对话记忆</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="clearPlan()">🗑 新对话</button>
+    </div>
+    <!-- Agent 状态栏 -->
+    <div id="agent-status" style="padding:8px 14px;border-radius:8px;font-size:.8rem;margin-bottom:16px;background:rgba(255,255,255,.04);border:1px solid var(--border);display:flex;align-items:center;gap:8px">
+      <span style="color:var(--text-muted)">⏳ 检测 Agent 服务中...</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+      <button class="tag" style="cursor:pointer" onclick="sendQuickPrompt('帮我规划北京3日游，重点历史文化景点')">🏯 北京3日游</button>
+      <button class="tag" style="cursor:pointer" onclick="sendQuickPrompt('推荐西安最值得去的景区，预算500元/天')">🗺 西安推荐</button>
+      <button class="tag" style="cursor:pointer" onclick="sendQuickPrompt('成都2日游怎么安排，喜欢美食和自然风光')">🌿 成都2日</button>
+      <button class="tag" style="cursor:pointer" onclick="sendQuickPrompt('故宫门票需要提前多久预约？')">❓ 景区攻略</button>
+    </div>
+    <div id="chat-messages" style="min-height:360px;max-height:520px;overflow-y:auto;padding:4px 0;margin-bottom:20px"></div>
+    <div style="display:flex;gap:10px;align-items:flex-end">
+      <textarea id="plan-input" class="form-input" rows="3"
+        placeholder="告诉我你的旅行计划，例如：帮我规划杭州2日游，喜欢自然风光，预算300元/天..."
+        style="flex:1;resize:none"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendPlanMessage();}"></textarea>
+      <button class="btn btn-primary" style="align-self:flex-end" onclick="sendPlanMessage()">发送 ↑</button>
+    </div>
+    <p style="font-size:.72rem;color:var(--text-muted);margin-top:8px">💡 Enter 发送 · Shift+Enter 换行 · Agent 抢票前会先确认</p>
+  </div>
+</div>
+
+<!-- ========== 探索页 ========== -->
+<div id="page-explore" class="page" style="padding-top:64px">
+  <div class="container" style="padding-top:36px;padding-bottom:48px">
+    <div class="section-title" style="margin-bottom:24px">🗺 探索<span>景区</span></div>
+    <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+      <input id="explore-city" class="form-input" placeholder="城市（如：北京）" style="width:180px">
+      <input id="explore-keyword" class="form-input" placeholder="关键词（如：故宫）" style="flex:1;min-width:140px">
+      <button class="btn btn-primary" onclick="searchAttractions($('#explore-city').value,$('#explore-keyword').value)">搜索</button>
+      <button class="btn btn-ghost" onclick="$('#explore-city').value='';$('#explore-keyword').value='';searchAttractions('','')">重置</button>
+    </div>
+    <div id="city-filters" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">
+      <span style="font-size:.78rem;color:var(--text-muted);align-self:center">热门城市:</span>
+    </div>
+    <div id="explore-list"><div class="loading-overlay"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<!-- ========== 秒杀页 ========== -->
+<div id="page-seckill" class="page" style="padding-top:64px">
+  <div class="container" style="padding-top:36px;padding-bottom:48px">
+    <div class="section-title" style="margin-bottom:6px">⚡ 秒杀<span>抢票</span></div>
+    <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:28px">Lua原子防超卖 · 令牌桶限流 · Kafka异步下单</div>
+    <div class="grid-2" style="gap:28px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div class="card">
+          <div style="font-weight:700;margin-bottom:14px">🎫 选择秒杀门票</div>
+          <div id="seckill-vouchers"><div class="loading-overlay"><div class="spinner"></div></div></div>
+        </div>
+        <div class="card">
+          <div style="font-weight:700;margin-bottom:12px">🔧 初始化库存（管理员）</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <input id="init-voucher-id" class="form-input" placeholder="优惠券ID" style="width:110px">
+            <input id="init-stock-num" class="form-input" placeholder="库存数量" style="width:100px">
+            <button class="btn btn-ghost btn-sm" onclick="initStockFromInput()">初始化</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card" style="border-color:var(--border-glow)">
+          <div style="font-weight:700;margin-bottom:14px">🎯 抢票操作</div>
+          <input id="seckill-voucher-id" type="hidden">
+          <div id="selected-voucher-name" style="font-size:.84rem;color:var(--text-muted);margin-bottom:16px;min-height:1.2em">请在左侧选择景区门票</div>
+          <div style="display:flex;gap:10px;margin-bottom:14px">
+            <button class="btn btn-ghost" style="flex:1" onclick="doPreCheck()">🔍 预检资格</button>
+            <button id="seckill-btn" class="btn btn-primary" style="flex:1" onclick="doSeckill()">🎫 立即抢票</button>
+          </div>
+          <div id="precheck-result"></div>
+          <div id="seckill-result"></div>
+        </div>
+        <div class="card" style="background:rgba(251,191,36,.03)">
+          <div style="font-size:.78rem;color:var(--text-muted);line-height:1.9">
+            <strong style="color:var(--accent)">⚡ 技术保障</strong><br>
+            ▸ Redis Lua 原子脚本防超卖<br>▸ 令牌桶限流，VIP 优先<br>
+            ▸ Kafka 异步削峰，Outbox 零丢单<br>▸ 幂等消费 + DLQ 死信兜底
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 订单页 ========== -->
+<div id="page-orders" class="page" style="padding-top:64px">
+  <div class="container" style="padding-top:36px;padding-bottom:48px;max-width:760px">
+    <div class="section-header">
+      <div>
+        <div class="section-title">📦 我的<span>订单</span></div>
+        <div class="section-sub">取消订单后库存自动回补，可重新抢购</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="loadOrders()">刷新</button>
+    </div>
+    <div id="orders-list" style="display:flex;flex-direction:column;gap:14px"></div>
+  </div>
+</div>
+
+<!-- JS -->
+<script src="src/js/core.js"></script>
+<script src="src/js/auth.js"></script>
+<script src="src/js/home.js"></script>
+<script src="src/js/plan.js"></script>
+<script src="src/js/explore.js"></script>
+<script src="src/js/seckill.js"></script>
+<script src="src/js/orders.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 恢复端口配置
+  const savedPorts = localStorage.getItem('aitrip_ports');
+  if (savedPorts) {
+    try {
+      const p = JSON.parse(savedPorts);
+      CONFIG.backendPort = p.backendPort || 8080;
+      CONFIG.agentPort   = p.agentPort   || 8081;
+    } catch {}
+  }
+  // 清除旧的错误端口缓存（8083/8085）
+  if (CONFIG.backendPort === 8083 || CONFIG.backendPort === 8085) {
+    CONFIG.backendPort = 8080;
+    localStorage.setItem('aitrip_ports', JSON.stringify({backendPort:8080,agentPort:8081}));
+  }
+
+  // 恢复登录状态
+  const saved = localStorage.getItem('aitrip_user');
+  if (saved) { try { state.user = JSON.parse(saved); } catch {} }
+  updateUserUI();
+
+  // 城市快捷按钮
+  const cities = ['北京','西安','上海','成都','杭州','南京','重庆','苏州'];
+  const cityFilters = document.getElementById('city-filters');
+  if (cityFilters) {
+    cities.forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'tag'; btn.style.cursor = 'pointer'; btn.textContent = c;
+      btn.onclick = () => {
+        document.getElementById('explore-city').value = c;
+        searchAttractions(c, '');
+      };
+      cityFilters.appendChild(btn);
+    });
+  }
+
+  // 检测后端服务状态
+  async function checkBackendStatus() {
+    const banner = document.getElementById('status-banner');
+    try {
+      const r = await fetch(`http://localhost:${CONFIG.backendPort}/actuator/health`,
+        {signal: AbortSignal.timeout(3000)});
+      const d = await r.json();
+      if (d.status === 'UP') {
+        if (banner) banner.style.display = 'none';
+      } else {
+        showBanner('⚠️ 后端服务状态异常: ' + d.status, '#f59e0b');
+      }
+    } catch {
+      showBanner(`❌ 后端服务未运行，请在 IDEA 启动 AiTripBackendApplication（当前端口: ${CONFIG.backendPort}）&nbsp;&nbsp;<button onclick="openPortSettings()" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:2px 10px;border-radius:4px;cursor:pointer;font-size:.8rem">⚙️ 修改端口</button>`, '#dc2626');
+    }
+  }
+
+  function showBanner(msg, color) {
+    const banner = document.getElementById('status-banner');
+    if (!banner) return;
+    banner.style.display = 'block';
+    banner.style.background = color;
+    banner.style.color = '#fff';
+    banner.innerHTML = msg;
+    // 给所有页面加顶部内边距
+    document.querySelectorAll('.page').forEach(p => p.style.paddingTop = '100px');
+  }
+
+  checkBackendStatus();
+  setInterval(checkBackendStatus, 15000); // 每15秒重新检测
+
+  // 统计景区数
+  api('/api/attractions/search?city=&keyword=')
+    .then(r => {
+      const list = parseData(r) || [];
+      const el = document.getElementById('stat-attractions');
+      if (el && list.length) el.textContent = list.length + '+';
+    }).catch(() => {});
+
+  // 激活首页
+  showPage('home');
+});
+</script>
+</body>
+</html>

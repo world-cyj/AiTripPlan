@@ -1,0 +1,61 @@
+# ShardingSphere 分库分表配置
+# 分片规则：userId % 2 == 0 -> hmdp_0, 奇数 -> hmdp_1
+
+dataSources:
+  main:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3308/aitrip?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: aitrip123
+    maximumPoolSize: 20
+    minimumIdle: 5
+  shard0:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3307/hmdp_0?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: aitrip123
+    maximumPoolSize: 10
+    minimumIdle: 2
+  shard1:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3307/hmdp_1?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: aitrip123
+    maximumPoolSize: 10
+    minimumIdle: 2
+
+rules:
+  - !SHARDING
+    defaultDataSourceName: main
+    tables:
+      tb_voucher_order:
+        actualDataNodes: shard$->{0..1}.tb_voucher_order
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: mod2
+        keyGenerateStrategy:
+          column: id
+          keyGeneratorName: snowflake
+      tb_order_route:
+        actualDataNodes: shard$->{0..1}.tb_order_route
+        databaseStrategy:
+          standard:
+            shardingColumn: user_id
+            shardingAlgorithmName: mod2
+    shardingAlgorithms:
+      mod2:
+        type: MOD
+        props:
+          sharding-count: 2
+    keyGenerators:
+      snowflake:
+        type: SNOWFLAKE
+        props:
+          worker-id: 1
+
+props:
+  sql-show: true

@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: aitrip-agent
+
+  ai:
+    openai:
+      api-key: sk-8382cc2749124cf984b1d75356aa0e5c
+      base-url: https://dashscope.aliyuncs.com/compatible-mode
+      chat:
+        options:
+          model: qwen-max
+          temperature: 0.7
+    mcp:
+      # MCP Server 配置（暂时禁用 STDIO transport，避免影响 Web 服务启动）
+      # server:
+      #   name: aitrip-backend-tools
+      #   version: 1.0.0
+      #   transport: STDIO
+      client:
+        enabled: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: aitrip123
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 4
+
+redisson:
+  config: classpath:redisson.yml
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+aitrip:
+  agent:
+    backend-url: http://localhost:8080
+    memory-ttl: 7200
+    plan-timeout: 30
+
+logging:
+  level:
+    com.aitrip: DEBUG
+    org.springframework.ai: INFO

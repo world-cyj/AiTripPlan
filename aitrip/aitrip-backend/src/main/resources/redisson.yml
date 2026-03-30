@@ -1,0 +1,19 @@
+# Redisson 单节点配置
+# 生产环境替换为 sentinelServersConfig 或 clusterServersConfig
+singleServerConfig:
+  address: "redis://localhost:6379"
+  password: "aitrip123"
+  database: 0
+  connectionPoolSize: 64
+  connectionMinimumIdleSize: 8
+  idleConnectionTimeout: 10000
+  connectTimeout: 10000
+  timeout: 3000
+  retryAttempts: 3
+  retryInterval: 1500
+  subscriptionsPerConnection: 5
+  subscriptionConnectionPoolSize: 50
+
+threads: 16
+nettyThreads: 32
+codec: !<org.redisson.codec.JsonJacksonCodec> {}

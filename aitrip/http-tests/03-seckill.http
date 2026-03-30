@@ -1,0 +1,147 @@
+### ============================================
+### 03 — 秒杀接口
+### ============================================
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@token = YOUR_TOKEN_HERE
+
+# ------------------------------------------
+# 3.1 初始化秒杀库存（管理员操作）
+# ------------------------------------------
+### 初始化兵马俑库存 100 张
+POST {{baseUrl}}/api/seckill/init-stock
+Content-Type: {{contentType}}
+
+{
+  "voucherId": 1001,
+  "stock": 100
+}
+
+###
+
+### 初始化故宫库存 50 张
+POST {{baseUrl}}/api/seckill/init-stock
+Content-Type: {{contentType}}
+
+{
+  "voucherId": 1002,
+  "stock": 50
+}
+
+###
+
+### 初始化九寨沟库存 30 张
+POST {{baseUrl}}/api/seckill/init-stock
+Content-Type: {{contentType}}
+
+{
+  "voucherId": 1003,
+  "stock": 30
+}
+
+###
+
+### 初始化八达岭长城库存 80 张
+POST {{baseUrl}}/api/seckill/init-stock
+Content-Type: {{contentType}}
+
+{
+  "voucherId": 1004,
+  "stock": 80
+}
+
+###
+
+### 初始化拙政园库存 40 张
+POST {{baseUrl}}/api/seckill/init-stock
+Content-Type: {{contentType}}
+
+{
+  "voucherId": 1005,
+  "stock": 40
+}
+
+###
+
+# ------------------------------------------
+# 3.2 预检秒杀资格（不扣库存）
+# ------------------------------------------
+### 预检 - 用户1 抢兵马俑
+GET {{baseUrl}}/api/seckill/pre-check?voucherId=1001&userId=1
+
+###
+
+### 预检 - 用户2 抢故宫
+GET {{baseUrl}}/api/seckill/pre-check?voucherId=1002&userId=2
+
+###
+
+### 预检 - 用户3 抢九寨沟
+GET {{baseUrl}}/api/seckill/pre-check?voucherId=1003&userId=3
+
+###
+
+# ------------------------------------------
+# 3.3 执行秒杀（实际扣库存+异步下单）
+# ------------------------------------------
+### 秒杀 - 用户1 抢兵马俑
+POST {{baseUrl}}/api/seckill/execute
+Content-Type: {{contentType}}
+
+{
+  "voucherId": 1001,
+  "userId": 1
+}
+
+###
+
+### 秒杀 - 用户2 抢兵马俑
+POST {{baseUrl}}/api/seckill/execute
+Content-Type: {{contentType}}
+
+{
+  "voucherId": 1001,
+  "userId": 2
+}
+
+###
+
+### 秒杀 - 用户3 抢故宫
+POST {{baseUrl}}/api/seckill/execute
+Content-Type: {{contentType}}
+
+{
+  "voucherId": 1002,
+  "userId": 3
+}
+
+###
+
+# ------------------------------------------
+# 3.4 错误测试 - 重复抢购（同一用户同一券）
+# ------------------------------------------
+### 重复抢购测试（期望返回错误：已抢购）
+POST {{baseUrl}}/api/seckill/execute
+Content-Type: {{contentType}}
+
+{
+  "voucherId": 1001,
+  "userId": 1
+}
+
+###
+
+# ------------------------------------------
+# 3.5 错误测试 - 不存在的优惠券
+# ------------------------------------------
+### 抢不存在的优惠券（期望返回错误）
+POST {{baseUrl}}/api/seckill/execute
+Content-Type: {{contentType}}
+
+{
+  "voucherId": 9999,
+  "userId": 1
+}
+
+###

@@ -1,0 +1,104 @@
+spring:
+  application:
+    name: aitrip-backend
+
+  # 数据源（主库，ShardingSphere 通过 sharding.yml 接管分片库）
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3308/aitrip?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: aitrip123
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+
+  # Redis（通过 Redisson 管理，此处配置 Spring Data Redis lettuce 连接池）
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: aitrip123
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 2
+
+  # Kafka
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      acks: all
+      retries: 3
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+    consumer:
+      group-id: aitrip-consumer-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.aitrip.*"
+    listener:
+      ack-mode: manual
+
+  # 缓存（Caffeine 本地缓存配置见 CaffeineCacheConfig）
+  cache:
+    type: caffeine
+
+# Redisson 配置
+redisson:
+  config: classpath:redisson.yml
+
+# MyBatis Plus
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.aitrip.backend.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: assign_id   # 雪花ID
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 雪花ID 工作节点（生产环境从环境变量注入）
+snowflake:
+  worker-id: ${WORKER_ID:1}
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+#    relaxed-query-chars: "|{}[]\\^`"
+    max-connections: 8192
+    accept-count: 1000
+    threads:
+      max: 400
+      min-spare: 50
+    connection-timeout: 20000
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.aitrip: DEBUG
+    org.springframework.kafka: INFO

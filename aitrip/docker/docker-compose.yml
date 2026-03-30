@@ -1,0 +1,107 @@
+services:
+  # MySQL 主库（用户/景区/优惠券数据）
+  mysql:
+    image: mysql:8.0
+    container_name: aitrip-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: aitrip123
+      MYSQL_DATABASE: aitrip
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./init-sql:/docker-entrypoint-initdb.d
+      - mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-paitrip123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MySQL 分库（订单库 hmdp_0 / hmdp_1）
+  mysql-shard:
+    image: mysql:8.0
+    container_name: aitrip-mysql-shard
+    environment:
+      MYSQL_ROOT_PASSWORD: aitrip123
+      MYSQL_DATABASE: hmdp_0
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./init-sql-shard:/docker-entrypoint-initdb.d
+      - mysql_shard_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-paitrip123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 单节点（开发环境）
+  redis:
+    image: redis:7.2
+    container_name: aitrip-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass aitrip123 --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "aitrip123", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: aitrip-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo ruok | nc localhost 2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: aitrip-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_LOG_RETENTION_HOURS: 168
+    healthcheck:
+      test: ["CMD", "bash", "-c", "kafka-topics --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 15s
+      timeout: 15s
+      retries: 10
+      start_period: 30s
+
+  # Kafka UI（方便调试）
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: aitrip-kafka-ui
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: aitrip-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka
+
+volumes:
+  mysql_data:
+  mysql_shard_data:
+  redis_data:

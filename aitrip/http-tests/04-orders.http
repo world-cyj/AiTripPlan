@@ -1,0 +1,65 @@
+### ============================================
+### 04 — 订单接口
+### ============================================
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@token = YOUR_TOKEN_HERE
+
+# ------------------------------------------
+# 4.1 获取用户订单列表
+# ------------------------------------------
+### 用户1的订单列表（第1页，每页10条）
+GET {{baseUrl}}/api/orders/user/1?page=1&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 用户2的订单列表
+GET {{baseUrl}}/api/orders/user/2?page=1&size=10
+Authorization: Bearer {{token}}
+
+###
+
+### 第2页订单
+GET {{baseUrl}}/api/orders/user/1?page=2&size=5
+Authorization: Bearer {{token}}
+
+###
+
+# ------------------------------------------
+# 4.2 获取订单详情
+# ------------------------------------------
+### 查询订单详情（将 orderId 替换为实际抢票返回的 orderId）
+GET {{baseUrl}}/api/orders/1001?userId=1
+Authorization: Bearer {{token}}
+
+###
+
+# ------------------------------------------
+# 4.3 取消订单（库存自动回补）
+# ------------------------------------------
+### 取消订单（将 orderId 替换为实际订单ID）
+POST {{baseUrl}}/api/orders/1001/cancel
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "userId": 1
+}
+
+###
+
+# ------------------------------------------
+# 4.4 错误测试 - 取消不属于自己的订单
+# ------------------------------------------
+### 越权取消（期望返回权限错误）
+POST {{baseUrl}}/api/orders/1001/cancel
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "userId": 999
+}
+
+###

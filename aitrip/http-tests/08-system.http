@@ -1,0 +1,123 @@
+### ============================================
+### 08 — 健康检查 & 系统接口
+### ============================================
+
+@baseUrl = http://localhost:8080
+
+# ------------------------------------------
+# 8.1 服务健康检查
+# ------------------------------------------
+### Spring Boot Actuator 健康检查
+GET {{baseUrl}}/actuator/health
+
+###
+
+### 查看所有可用 Actuator 端点
+GET {{baseUrl}}/actuator
+
+###
+
+### 查看应用信息
+GET {{baseUrl}}/actuator/info
+
+###
+
+### 查看指标
+GET {{baseUrl}}/actuator/metrics
+
+###
+
+# ------------------------------------------
+# 8.2 并发压测场景（手动多次点击）
+# ------------------------------------------
+### 并发秒杀测试 - 用户4
+POST {{baseUrl}}/api/seckill/execute
+Content-Type: application/json
+
+{
+  "voucherId": 1001,
+  "userId": 4
+}
+
+###
+
+### 并发秒杀测试 - 用户5
+POST {{baseUrl}}/api/seckill/execute
+Content-Type: application/json
+
+{
+  "voucherId": 1001,
+  "userId": 5
+}
+
+###
+
+### 并发秒杀测试 - 用户6
+POST {{baseUrl}}/api/seckill/execute
+Content-Type: application/json
+
+{
+  "voucherId": 1001,
+  "userId": 6
+}
+
+###
+
+### 并发秒杀测试 - 用户7
+POST {{baseUrl}}/api/seckill/execute
+Content-Type: application/json
+
+{
+  "voucherId": 1001,
+  "userId": 7
+}
+
+###
+
+### 并发秒杀测试 - 用户8
+POST {{baseUrl}}/api/seckill/execute
+Content-Type: application/json
+
+{
+  "voucherId": 1001,
+  "userId": 8
+}
+
+###
+
+# ------------------------------------------
+# 8.3 批量记录热度（为热榜填充数据）
+# ------------------------------------------
+### 批量访问记录 - 兵马俑（多次调用填充热度）
+POST {{baseUrl}}/api/rank/visit?attractionId=1001&userId=user001
+
+###
+
+POST {{baseUrl}}/api/rank/visit?attractionId=1001&userId=user002
+
+###
+
+POST {{baseUrl}}/api/rank/visit?attractionId=1006&userId=user001
+
+###
+
+POST {{baseUrl}}/api/rank/visit?attractionId=1006&userId=user003
+
+###
+
+POST {{baseUrl}}/api/rank/visit?attractionId=1013&userId=user002
+
+###
+
+POST {{baseUrl}}/api/rank/visit?attractionId=1010&userId=user004
+
+###
+
+POST {{baseUrl}}/api/rank/visit?attractionId=1014&userId=user005
+
+###
+
+### 填充热度后查看热榜
+GET {{baseUrl}}/api/rank/hot?topN=10
+
+###

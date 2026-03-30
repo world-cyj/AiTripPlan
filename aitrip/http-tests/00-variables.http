@@ -1,0 +1,23 @@
+### AiTrip API 测试集
+### 使用方式：在 VS Code 安装 REST Client 插件，或在 IDEA 中直接打开 .http 文件
+### 点击请求上方的 "Send Request" 按钮即可发送
+
+# ====================================================
+# 全局变量配置
+# ====================================================
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+# 登录后将 token 填入此处（从登录响应的 data.token 字段复制）
+@token = YOUR_TOKEN_HERE
+
+# 测试用户
+@phone1 = 13800000001
+@phone2 = 13800000002
+@phone3 = 13800000003
+@code   = 123456
+
+# 测试景区/优惠券 ID
+@attractionId = 1001
+@voucherId    = 1001
+@userId       = 1

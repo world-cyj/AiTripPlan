@@ -1,0 +1,15 @@
+singleServerConfig:
+  address: "redis://localhost:6379"
+  password: "aitrip123"
+  database: 1
+  connectionPoolSize: 32
+  connectionMinimumIdleSize: 4
+  idleConnectionTimeout: 10000
+  connectTimeout: 10000
+  timeout: 3000
+  retryAttempts: 3
+  retryInterval: 1500
+
+threads: 8
+nettyThreads: 16
+codec: !<org.redisson.codec.JsonJacksonCodec> {}

@@ -1,0 +1,76 @@
+### ============================================
+### 06 — 订阅通知接口
+### ============================================
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@token = YOUR_TOKEN_HERE
+
+# ------------------------------------------
+# 6.1 订阅到票提醒
+# ------------------------------------------
+### 用户1订阅兵马俑到票提醒
+POST {{baseUrl}}/api/notify/subscribe?voucherId=1001&userId=1
+Authorization: Bearer {{token}}
+
+###
+
+### 用户2订阅故宫到票提醒
+POST {{baseUrl}}/api/notify/subscribe?voucherId=1002&userId=2
+Authorization: Bearer {{token}}
+
+###
+
+### 用户3订阅九寨沟到票提醒
+POST {{baseUrl}}/api/notify/subscribe?voucherId=1003&userId=3
+Authorization: Bearer {{token}}
+
+###
+
+### 用户1再次订阅同一景区（测试幂等性）
+POST {{baseUrl}}/api/notify/subscribe?voucherId=1001&userId=1
+Authorization: Bearer {{token}}
+
+###
+
+# ------------------------------------------
+# 6.2 查询排队位置
+# ------------------------------------------
+### 查询用户1在兵马俑的排队位置
+GET {{baseUrl}}/api/notify/position?voucherId=1001&userId=1
+Authorization: Bearer {{token}}
+
+###
+
+### 查询用户2在故宫的排队位置
+GET {{baseUrl}}/api/notify/position?voucherId=1002&userId=2
+Authorization: Bearer {{token}}
+
+###
+
+### 查询未订阅用户的排队位置（期望返回未订阅）
+GET {{baseUrl}}/api/notify/position?voucherId=1001&userId=9999
+Authorization: Bearer {{token}}
+
+###
+
+# ------------------------------------------
+# 6.3 取消订阅
+# ------------------------------------------
+### 用户1取消兵马俑订阅
+DELETE {{baseUrl}}/api/notify/subscribe?voucherId=1001&userId=1
+Authorization: Bearer {{token}}
+
+###
+
+### 取消后再查询位置（期望返回未订阅）
+GET {{baseUrl}}/api/notify/position?voucherId=1001&userId=1
+Authorization: Bearer {{token}}
+
+###
+
+### 重新订阅（取消后可再次订阅）
+POST {{baseUrl}}/api/notify/subscribe?voucherId=1001&userId=1
+Authorization: Bearer {{token}}
+
+###

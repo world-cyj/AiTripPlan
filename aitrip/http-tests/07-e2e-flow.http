@@ -1,0 +1,170 @@
+### ============================================
+### 07 — 完整业务流程测试（端到端）
+### ============================================
+### 按顺序执行，模拟真实用户使用流程
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+# ==================================================
+# STEP 1: 登录获取 Token
+# ==================================================
+### [STEP 1] 用户1登录
+# 执行后从响应中复制 data 字段的 token 值
+# 填入下方 @token 变量
+POST {{baseUrl}}/api/user/login
+Content-Type: {{contentType}}
+
+{
+  "phone": "13800000001",
+  "code": "123456"
+}
+
+###
+
+# 将登录返回的 token 填入此处
+@token = YOUR_TOKEN_HERE
+# 将登录返回的 userId 填入此处  
+@userId = 1
+
+# ==================================================
+# STEP 2: 浏览景区
+# ==================================================
+### [STEP 2a] 搜索西安景区
+GET {{baseUrl}}/api/attractions/search?city=xian
+
+###
+
+### [STEP 2b] 查看兵马俑详情
+GET {{baseUrl}}/api/attractions/1001
+
+###
+
+### [STEP 2c] 记录访问热度（埋点）
+POST {{baseUrl}}/api/rank/visit?attractionId=1001&userId={{userId}}
+
+###
+
+### [STEP 2d] 查看库存
+GET {{baseUrl}}/api/attractions/1001/stock
+
+###
+
+# ==================================================
+# STEP 3: 初始化秒杀库存（如库存为0需先执行）
+# ==================================================
+### [STEP 3] 初始化库存
+POST {{baseUrl}}/api/seckill/init-stock
+Content-Type: {{contentType}}
+
+{
+  "voucherId": 1001,
+  "stock": 100
+}
+
+###
+
+# ==================================================
+# STEP 4: 预检秒杀资格
+# ==================================================
+### [STEP 4] 预检资格
+GET {{baseUrl}}/api/seckill/pre-check?voucherId=1001&userId={{userId}}
+Authorization: Bearer {{token}}
+
+###
+
+# ==================================================
+# STEP 5: 执行秒杀
+# ==================================================
+### [STEP 5] 立即抢票
+# 响应中会返回 orderId，保存下来用于后续查询
+POST {{baseUrl}}/api/seckill/execute
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "voucherId": 1001,
+  "userId": {{userId}}
+}
+
+###
+
+# 将抢票返回的 orderId 填入此处
+@orderId = YOUR_ORDER_ID_HERE
+
+# ==================================================
+# STEP 6: 查看订单
+# ==================================================
+### [STEP 6a] 查看订单详情
+GET {{baseUrl}}/api/orders/{{orderId}}?userId={{userId}}
+Authorization: Bearer {{token}}
+
+###
+
+### [STEP 6b] 查看全部订单
+GET {{baseUrl}}/api/orders/user/{{userId}}?page=1&size=10
+Authorization: Bearer {{token}}
+
+###
+
+# ==================================================
+# STEP 7: 取消订单（库存回补测试）
+# ==================================================
+### [STEP 7a] 取消订单
+POST {{baseUrl}}/api/orders/{{orderId}}/cancel
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "userId": {{userId}}
+}
+
+###
+
+### [STEP 7b] 确认库存已回补
+GET {{baseUrl}}/api/attractions/1001/stock
+
+###
+
+# ==================================================
+# STEP 8: 售罄后订阅提醒
+# ==================================================
+### [STEP 8a] 将库存设为0（模拟售罄）
+POST {{baseUrl}}/api/seckill/init-stock
+Content-Type: {{contentType}}
+
+{
+  "voucherId": 1001,
+  "stock": 0
+}
+
+###
+
+### [STEP 8b] 订阅到票提醒
+POST {{baseUrl}}/api/notify/subscribe?voucherId=1001&userId={{userId}}
+Authorization: Bearer {{token}}
+
+###
+
+### [STEP 8c] 查看排队位置
+GET {{baseUrl}}/api/notify/position?voucherId=1001&userId={{userId}}
+Authorization: Bearer {{token}}
+
+###
+
+# ==================================================
+# STEP 9: 热榜验证
+# ==================================================
+### [STEP 9] 查看实时热榜（访问埋点后热度应上升）
+GET {{baseUrl}}/api/rank/hot?topN=10
+
+###
+
+# ==================================================
+# STEP 10: 退出登录
+# ==================================================
+### [STEP 10] 退出登录
+POST {{baseUrl}}/api/user/logout
+Authorization: Bearer {{token}}
+
+###

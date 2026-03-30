@@ -1,0 +1,38 @@
+:root {
+  /* 主色调：深夜星空 + 琥珀点缀 */
+  --bg-deep:       #0a0e1a;
+  --bg-card:       #111827;
+  --bg-card-hover: #1a2235;
+  --bg-glass:      rgba(17, 24, 39, 0.85);
+  --border:        rgba(255, 255, 255, 0.07);
+  --border-glow:   rgba(251, 191, 36, 0.3);
+
+  --accent:        #fbbf24;   /* 琥珀黄 */
+  --accent-dim:    #d97706;
+  --accent-glow:   rgba(251, 191, 36, 0.15);
+  --teal:          #2dd4bf;   /* 青碧 */
+  --teal-dim:      #0d9488;
+  --rose:          #fb7185;   /* 玫红（错误/警告）*/
+
+  --text-primary:  #f1f5f9;
+  --text-secondary:#94a3b8;
+  --text-muted:    #475569;
+
+  /* 字体 */
+  --font-main:     'Noto Sans SC', 'Outfit', sans-serif;
+  --font-mono:     'JetBrains Mono', monospace;
+
+  /* 间距 */
+  --radius-sm:  8px;
+  --radius-md:  14px;
+  --radius-lg:  22px;
+  --radius-xl:  32px;
+
+  /* 动画 */
+  --ease-out:   cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring:cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* 阴影 */
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-glow: 0 0 32px rgba(251,191,36,0.12);
+}
